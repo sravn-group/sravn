@@ -23,21 +23,15 @@ export function CTASection() {
     setError(null)
 
     const formData = new FormData(e.currentTarget)
+    formData.append("enquiryType", enquiryType)
 
     try {
-      const response = await fetch("/api/contact", {
+      const response = await fetch("https://formspree.io/f/mlgevagg", {
         method: "POST",
+        body: formData,
         headers: {
-          "Content-Type": "application/json",
+          Accept: "application/json",
         },
-        body: JSON.stringify({
-          firstName: formData.get("firstName"),
-          lastName: formData.get("lastName"),
-          email: formData.get("email"),
-          phone: formData.get("phone"),
-          enquiryType: enquiryType,
-          message: formData.get("message"),
-        }),
       })
 
       if (!response.ok) {
@@ -96,9 +90,6 @@ export function CTASection() {
                 <h3 className="text-xl font-semibold mb-2 text-foreground">Thank You!</h3>
                 <p className="text-muted-foreground mb-4">
                   Your inquiry has been submitted successfully. We will contact you within 24-48 hours.
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  A confirmation email has been sent to your email address.
                 </p>
                 <Button className="mt-6 bg-transparent" variant="outline" onClick={() => setIsSubmitted(false)}>
                   Submit Another Inquiry
