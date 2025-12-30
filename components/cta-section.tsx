@@ -35,20 +35,17 @@ export function CTASection() {
     urlEncodedData.append("message", (formData.get("message") as string) || "")
 
     try {
-      const response = await fetch(
+      await fetch(
         "https://script.google.com/macros/s/AKfycbz6URBku_HU2Cc4RGLFlVd_Y3IBpzT8QP7edk1dEi7DlzivMbmQhSjXz5Aptv7jqDqO6Q/exec",
         {
           method: "POST",
+          mode: "no-cors",
           headers: {
             "Content-Type": "application/x-www-form-urlencoded",
           },
           body: urlEncodedData.toString(),
         },
       )
-
-      if (!response.ok) {
-        throw new Error("Failed to submit inquiry")
-      }
 
       setIsSubmitted(true)
     } catch (err) {
