@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useState } from "react"
 import { motion } from "framer-motion"
-import { ArrowRight } from "lucide-react"
+import { ArrowRight, CheckCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -13,14 +13,43 @@ import { Textarea } from "@/components/ui/textarea"
 
 export function CTASection() {
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSubmitted, setIsSubmitted] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [enquiryType, setEnquiryType] = useState("")
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setIsSubmitting(true)
-    // Simulate form submission
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-    setIsSubmitting(false)
-    alert("Thank you for your inquiry. We will contact you shortly.")
+    setError(null)
+
+    const formData = new FormData(e.currentTarget)
+
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          firstName: formData.get("firstName"),
+          lastName: formData.get("lastName"),
+          email: formData.get("email"),
+          phone: formData.get("phone"),
+          enquiryType: enquiryType,
+          message: formData.get("message"),
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to submit inquiry")
+      }
+
+      setIsSubmitted(true)
+    } catch (err) {
+      setError("Something went wrong. Please try again or email us directly at sravninfo@gmail.com")
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -59,60 +88,84 @@ export function CTASection() {
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <form onSubmit={handleSubmit} className="p-8 rounded-lg bg-card border border-border">
-              <h3 className="text-xl font-semibold mb-6 text-foreground">Contact Us</h3>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                <div className="space-y-2">
-                  <Label htmlFor="firstName">First Name</Label>
-                  <Input id="firstName" placeholder="Enter first name" required />
+            {isSubmitted ? (
+              <div className="p-8 rounded-lg bg-card border border-border text-center">
+                <div className="flex justify-center mb-4">
+                  <CheckCircle className="h-16 w-16 text-primary" />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="lastName">Last Name</Label>
-                  <Input id="lastName" placeholder="Enter last name" required />
+                <h3 className="text-xl font-semibold mb-2 text-foreground">Thank You!</h3>
+                <p className="text-muted-foreground mb-4">
+                  Your inquiry has been submitted successfully. We will contact you within 24-48 hours.
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  A confirmation email has been sent to your email address.
+                </p>
+                <Button className="mt-6 bg-transparent" variant="outline" onClick={() => setIsSubmitted(false)}>
+                  Submit Another Inquiry
+                </Button>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit} className="p-8 rounded-lg bg-card border border-border">
+                <h3 className="text-xl font-semibold mb-6 text-foreground">Contact Us</h3>
+
+                {error && (
+                  <div className="mb-4 p-3 bg-destructive/10 border border-destructive/20 rounded-md text-sm text-destructive">
+                    {error}
+                  </div>
+                )}
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="firstName">First Name</Label>
+                    <Input id="firstName" name="firstName" placeholder="Enter first name" required />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="lastName">Last Name</Label>
+                    <Input id="lastName" name="lastName" placeholder="Enter last name" required />
+                  </div>
                 </div>
-              </div>
 
-              <div className="space-y-2 mb-4">
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" placeholder="Enter email address" required />
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                <div className="space-y-2">
-                  <Label htmlFor="phone">Phone</Label>
-                  <Input id="phone" type="tel" placeholder="Enter phone number" />
+                <div className="space-y-2 mb-4">
+                  <Label htmlFor="email">Email</Label>
+                  <Input id="email" name="email" type="email" placeholder="Enter email address" required />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="enquiryType">Enquiry Type</Label>
-                  <Select>
-                    <SelectTrigger id="enquiryType">
-                      <SelectValue placeholder="Select type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="individual">Individual / Family</SelectItem>
-                      <SelectItem value="institution">Institution</SelectItem>
-                      <SelectItem value="csr">CSR Partnership</SelectItem>
-                      <SelectItem value="government">Government Body</SelectItem>
-                      <SelectItem value="other">Other</SelectItem>
-                    </SelectContent>
-                  </Select>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="phone">Phone</Label>
+                    <Input id="phone" name="phone" type="tel" placeholder="Enter phone number" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="enquiryType">Enquiry Type</Label>
+                    <Select onValueChange={setEnquiryType}>
+                      <SelectTrigger id="enquiryType">
+                        <SelectValue placeholder="Select type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Individual / Family">Individual / Family</SelectItem>
+                        <SelectItem value="Institution">Institution</SelectItem>
+                        <SelectItem value="CSR Partnership">CSR Partnership</SelectItem>
+                        <SelectItem value="Government Body">Government Body</SelectItem>
+                        <SelectItem value="Other">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
-              </div>
 
-              <div className="space-y-2 mb-6">
-                <Label htmlFor="message">Message</Label>
-                <Textarea id="message" placeholder="Tell us about your requirements" rows={4} />
-              </div>
+                <div className="space-y-2 mb-6">
+                  <Label htmlFor="message">Message</Label>
+                  <Textarea id="message" name="message" placeholder="Tell us about your requirements" rows={4} />
+                </div>
 
-              <Button
-                type="submit"
-                className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? "Submitting..." : "Submit Inquiry"}
-              </Button>
-            </form>
+                <Button
+                  type="submit"
+                  className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? "Submitting..." : "Submit Inquiry"}
+                </Button>
+              </form>
+            )}
           </motion.div>
         </div>
       </div>
