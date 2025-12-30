@@ -26,12 +26,23 @@ export function CTASection() {
     const formData = new FormData(form)
     formData.set("enquiryType", enquiryType)
 
+    const urlEncodedData = new URLSearchParams()
+    urlEncodedData.append("firstName", formData.get("firstName") as string)
+    urlEncodedData.append("lastName", formData.get("lastName") as string)
+    urlEncodedData.append("email", formData.get("email") as string)
+    urlEncodedData.append("phone", (formData.get("phone") as string) || "")
+    urlEncodedData.append("enquiryType", enquiryType)
+    urlEncodedData.append("message", (formData.get("message") as string) || "")
+
     try {
       const response = await fetch(
-        "https://script.google.com/macros/s/AKfycbxa3y5_p8XDjKFhqEyjAbJVOoc1p4qZv8_Q-IPssTjxttjqWOo7cGgP9tRpiy5KPn0I5Q/exec",
+        "https://script.google.com/macros/s/AKfycbz6URBku_HU2Cc4RGLFlVd_Y3IBpzT8QP7edk1dEi7DlzivMbmQhSjXz5Aptv7jqDqO6Q/exec",
         {
           method: "POST",
-          body: formData,
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: urlEncodedData.toString(),
         },
       )
 
