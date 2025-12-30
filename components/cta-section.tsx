@@ -22,17 +22,18 @@ export function CTASection() {
     setIsSubmitting(true)
     setError(null)
 
-    const formData = new FormData(e.currentTarget)
-    formData.append("enquiryType", enquiryType)
+    const form = e.currentTarget
+    const formData = new FormData(form)
+    formData.set("enquiryType", enquiryType)
 
     try {
-      const response = await fetch("https://formspree.io/f/mlgevagg", {
-        method: "POST",
-        body: formData,
-        headers: {
-          Accept: "application/json",
+      const response = await fetch(
+        "https://script.google.com/macros/s/AKfycbxSIe86uGaYT4Ylu69BwUk7azDYccKieRwswKSI6WekL71-cFrbPzikjYTvlrl-aCdzoQ/exec",
+        {
+          method: "POST",
+          body: formData,
         },
-      })
+      )
 
       if (!response.ok) {
         throw new Error("Failed to submit inquiry")
@@ -89,7 +90,7 @@ export function CTASection() {
                 </div>
                 <h3 className="text-xl font-semibold mb-2 text-foreground">Thank You!</h3>
                 <p className="text-muted-foreground mb-4">
-                  Your inquiry has been submitted successfully. We will contact you within 24-48 hours.
+                  Thank you for contacting SRAVN. Our team will reach out shortly.
                 </p>
                 <Button className="mt-6 bg-transparent" variant="outline" onClick={() => setIsSubmitted(false)}>
                   Submit Another Inquiry
@@ -128,7 +129,7 @@ export function CTASection() {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="enquiryType">Enquiry Type</Label>
-                    <Select onValueChange={setEnquiryType}>
+                    <Select onValueChange={setEnquiryType} name="enquiryType">
                       <SelectTrigger id="enquiryType">
                         <SelectValue placeholder="Select type" />
                       </SelectTrigger>
