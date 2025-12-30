@@ -28,7 +28,7 @@ export function CTASection() {
 
     try {
       const response = await fetch(
-        "https://script.google.com/macros/s/AKfycbxSIe86uGaYT4Ylu69BwUk7azDYccKieRwswKSI6WekL71-cFrbPzikjYTvlrl-aCdzoQ/exec",
+        "https://script.google.com/macros/s/AKfycbxa3y5_p8XDjKFhqEyjAbJVOoc1p4qZv8_Q-IPssTjxttjqWOo7cGgP9tRpiy5KPn0I5Q/exec",
         {
           method: "POST",
           body: formData,
@@ -41,7 +41,7 @@ export function CTASection() {
 
       setIsSubmitted(true)
     } catch (err) {
-      setError("Something went wrong. Please try again or email us directly at sravninfo@gmail.com")
+      setError("Something went wrong. Please try again or email us directly at sravninfo@gmail.com.")
     } finally {
       setIsSubmitting(false)
     }
