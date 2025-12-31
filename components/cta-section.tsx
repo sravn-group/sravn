@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { motion } from "framer-motion"
 import { ArrowRight, CheckCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -11,11 +11,15 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 
+const GOOGLE_SCRIPT_URL =
+  "https://script.google.com/macros/s/AKfycbz6URBku_HU2Cc4RGLFlVd_Y3IBpzT8QP7edk1dEi7DlzivMbmQhSjXz5Aptv7jqDqO6Q/exec"
+
 export function CTASection() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [enquiryType, setEnquiryType] = useState("")
+  const formRef = useRef<HTMLFormElement>(null)
 
   const scrollToForm = () => {
     const formElement = document.getElementById("contact-form")
@@ -31,33 +35,49 @@ export function CTASection() {
 
     const form = e.currentTarget
     const formData = new FormData(form)
-    formData.set("enquiryType", enquiryType)
 
-    const urlEncodedData = new URLSearchParams()
-    urlEncodedData.append("firstName", formData.get("firstName") as string)
-    urlEncodedData.append("lastName", formData.get("lastName") as string)
-    urlEncodedData.append("email", formData.get("email") as string)
-    urlEncodedData.append("phone", (formData.get("phone") as string) || "")
-    urlEncodedData.append("enquiryType", enquiryType)
-    urlEncodedData.append("message", (formData.get("message") as string) || "")
+    const data = {
+      firstName: formData.get("firstName") as string,
+      lastName: formData.get("lastName") as string,
+      email: formData.get("email") as string,
+      phone: (formData.get("phone") as string) || "",
+      enquiryType: enquiryType || "Not specified",
+      message: (formData.get("message") as string) || "",
+    }
 
     try {
-      await fetch(
-        "https://script.google.com/macros/s/AKfycbz6URBku_HU2Cc4RGLFlVd_Y3IBpzT8QP7edk1dEi7DlzivMbmQhSjXz5Aptv7jqDqO6Q/exec",
-        {
-          method: "POST",
-          mode: "no-cors",
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-          body: urlEncodedData.toString(),
-        },
-      )
+      const iframe = document.createElement("iframe")
+      iframe.name = "hidden_iframe"
+      iframe.style.display = "none"
+      document.body.appendChild(iframe)
 
-      setIsSubmitted(true)
+      const hiddenForm = document.createElement("form")
+      hiddenForm.method = "POST"
+      hiddenForm.action = GOOGLE_SCRIPT_URL
+      hiddenForm.target = "hidden_iframe"
+
+      Object.entries(data).forEach(([key, value]) => {
+        const input = document.createElement("input")
+        input.type = "hidden"
+        input.name = key
+        input.value = value
+        hiddenForm.appendChild(input)
+      })
+
+      document.body.appendChild(hiddenForm)
+      hiddenForm.submit()
+
+      setTimeout(() => {
+        document.body.removeChild(hiddenForm)
+        document.body.removeChild(iframe)
+      }, 1000)
+
+      setTimeout(() => {
+        setIsSubmitted(true)
+        setIsSubmitting(false)
+      }, 1500)
     } catch (err) {
       setError("Something went wrong. Please try again or email us directly at sravninfo@gmail.com.")
-    } finally {
       setIsSubmitting(false)
     }
   }
@@ -116,7 +136,12 @@ export function CTASection() {
                 </Button>
               </div>
             ) : (
-              <form id="contact-form" onSubmit={handleSubmit} className="p-8 rounded-lg bg-card border border-border">
+              <form
+                id="contact-form"
+                ref={formRef}
+                onSubmit={handleSubmit}
+                className="p-8 rounded-lg bg-card border border-border"
+              >
                 <h3 className="text-xl font-semibold mb-6 text-foreground">Contact Us</h3>
 
                 {error && (
