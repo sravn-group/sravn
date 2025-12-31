@@ -11,8 +11,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 
-const GOOGLE_SCRIPT_URL =
-  "https://script.google.com/macros/s/AKfycbz6URBku_HU2Cc4RGLFlVd_Y3IBpzT8QP7edk1dEi7DlzivMbmQhSjXz5Aptv7jqDqO6Q/exec"
+const FORMSPREE_URL = "https://formspree.io/f/mlgevagg"
 
 export function CTASection() {
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -36,31 +35,25 @@ export function CTASection() {
     const form = e.currentTarget
     const formData = new FormData(form)
 
-    const data = {
-      firstName: formData.get("firstName") as string,
-      lastName: formData.get("lastName") as string,
-      email: formData.get("email") as string,
-      phone: (formData.get("phone") as string) || "",
-      enquiryType: enquiryType || "Not specified",
-      message: (formData.get("message") as string) || "",
-    }
+    // Add enquiry type to form data
+    formData.set("enquiryType", enquiryType || "Not specified")
 
     try {
-      const response = await fetch("/api/contact", {
+      const response = await fetch(FORMSPREE_URL, {
         method: "POST",
+        body: formData,
         headers: {
-          "Content-Type": "application/json",
+          Accept: "application/json",
         },
-        body: JSON.stringify(data),
       })
 
-      if (!response.ok) {
+      if (response.ok) {
+        setIsSubmitted(true)
+        form.reset()
+        setEnquiryType("")
+      } else {
         throw new Error("Failed to submit")
       }
-
-      setIsSubmitted(true)
-      form.reset()
-      setEnquiryType("")
     } catch (err) {
       setError("Something went wrong. Please try again or email us directly at sravninfo@gmail.com.")
     } finally {
