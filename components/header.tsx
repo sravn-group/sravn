@@ -8,6 +8,14 @@ import { Menu, X } from "lucide-react"
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
+  const scrollToContact = () => {
+    const contactSection = document.getElementById("contact")
+    if (contactSection) {
+      contactSection.scrollIntoView({ behavior: "smooth" })
+    }
+    setIsMenuOpen(false)
+  }
+
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4 lg:px-8">
@@ -45,10 +53,14 @@ export function Header() {
           </nav>
 
           <div className="hidden md:flex items-center gap-4">
-            <Button variant="ghost" size="sm">
+            <Button variant="ghost" size="sm" onClick={scrollToContact}>
               Partner With Us
             </Button>
-            <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
+            <Button
+              size="sm"
+              className="bg-primary text-primary-foreground hover:bg-primary/90"
+              onClick={scrollToContact}
+            >
               Request Information
             </Button>
           </div>
@@ -88,10 +100,14 @@ export function Header() {
                 Contact
               </Link>
               <div className="flex flex-col gap-2 pt-4">
-                <Button variant="ghost" size="sm">
+                <Button variant="ghost" size="sm" onClick={scrollToContact}>
                   Partner With Us
                 </Button>
-                <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
+                <Button
+                  size="sm"
+                  className="bg-primary text-primary-foreground hover:bg-primary/90"
+                  onClick={scrollToContact}
+                >
                   Request Information
                 </Button>
               </div>

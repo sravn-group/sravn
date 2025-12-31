@@ -20,6 +20,13 @@ export function HeroSection() {
     return () => clearTimeout(timeoutId)
   }, [titleNumber, titles])
 
+  const scrollToContact = () => {
+    const contactSection = document.getElementById("contact")
+    if (contactSection) {
+      contactSection.scrollIntoView({ behavior: "smooth" })
+    }
+  }
+
   return (
     <section className="relative w-full overflow-hidden">
       <div className="container mx-auto px-4 lg:px-8">
@@ -78,11 +85,15 @@ export function HeroSection() {
               transition={{ duration: 0.6, delay: 0.3 }}
               className="flex flex-col sm:flex-row gap-4 mt-10"
             >
-              <Button size="lg" className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90 px-8">
+              <Button
+                size="lg"
+                className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90 px-8"
+                onClick={scrollToContact}
+              >
                 Request Information
                 <ArrowRight className="h-4 w-4" />
               </Button>
-              <Button size="lg" variant="outline" className="gap-2 px-8 bg-transparent">
+              <Button size="lg" variant="outline" className="gap-2 px-8 bg-transparent" onClick={scrollToContact}>
                 <Phone className="h-4 w-4" />
                 Partner With Us
               </Button>

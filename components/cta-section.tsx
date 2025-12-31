@@ -17,6 +17,13 @@ export function CTASection() {
   const [error, setError] = useState<string | null>(null)
   const [enquiryType, setEnquiryType] = useState("")
 
+  const scrollToForm = () => {
+    const formElement = document.getElementById("contact-form")
+    if (formElement) {
+      formElement.scrollIntoView({ behavior: "smooth" })
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setIsSubmitting(true)
@@ -75,11 +82,15 @@ export function CTASection() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button size="lg" className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90">
+              <Button
+                size="lg"
+                className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90"
+                onClick={scrollToForm}
+              >
                 Request Information
                 <ArrowRight className="h-4 w-4" />
               </Button>
-              <Button size="lg" variant="outline" className="gap-2 bg-transparent">
+              <Button size="lg" variant="outline" className="gap-2 bg-transparent" onClick={scrollToForm}>
                 Explore Partnership
               </Button>
             </div>
@@ -105,7 +116,7 @@ export function CTASection() {
                 </Button>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="p-8 rounded-lg bg-card border border-border">
+              <form id="contact-form" onSubmit={handleSubmit} className="p-8 rounded-lg bg-card border border-border">
                 <h3 className="text-xl font-semibold mb-6 text-foreground">Contact Us</h3>
 
                 {error && (
