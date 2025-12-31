@@ -46,38 +46,24 @@ export function CTASection() {
     }
 
     try {
-      const iframe = document.createElement("iframe")
-      iframe.name = "hidden_iframe"
-      iframe.style.display = "none"
-      document.body.appendChild(iframe)
-
-      const hiddenForm = document.createElement("form")
-      hiddenForm.method = "POST"
-      hiddenForm.action = GOOGLE_SCRIPT_URL
-      hiddenForm.target = "hidden_iframe"
-
-      Object.entries(data).forEach(([key, value]) => {
-        const input = document.createElement("input")
-        input.type = "hidden"
-        input.name = key
-        input.value = value
-        hiddenForm.appendChild(input)
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
       })
 
-      document.body.appendChild(hiddenForm)
-      hiddenForm.submit()
+      if (!response.ok) {
+        throw new Error("Failed to submit")
+      }
 
-      setTimeout(() => {
-        document.body.removeChild(hiddenForm)
-        document.body.removeChild(iframe)
-      }, 1000)
-
-      setTimeout(() => {
-        setIsSubmitted(true)
-        setIsSubmitting(false)
-      }, 1500)
+      setIsSubmitted(true)
+      form.reset()
+      setEnquiryType("")
     } catch (err) {
       setError("Something went wrong. Please try again or email us directly at sravninfo@gmail.com.")
+    } finally {
       setIsSubmitting(false)
     }
   }
