@@ -1,8 +1,6 @@
 "use client"
 
-import type React from "react"
-
-import { useState } from "react"
+import { useEffect, useState, FormEvent } from "react"
 import { motion } from "framer-motion"
 import { ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -12,15 +10,62 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea"
 
 export function CTASection() {
-  const [isSubmitting, setIsSubmitting] = useState(false)
+    const [loading, setLoading] = useState(false)
+    //const [enquiryType, setEnquiryType] = useState("")
+    const [status, setStatus] = useState<"" | "success" | "error">("")
+    const [timeline, setTimeline] = useState("")
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
-    // Simulate form submission
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-    setIsSubmitting(false)
-    alert("Thank you for your inquiry. We will contact you shortly.")
+    
+    useEffect(() => {
+      if (status) {
+        const timer = setTimeout(() => setStatus(""), 2500)
+        return () => clearTimeout(timer)
+      }
+    }, [status])
+    
+    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+      e.preventDefault()
+      setLoading(true)
+      
+      const form = e.currentTarget
+      const formData = new FormData(form)
+      console.log("Form Data:", Object.fromEntries(formData.entries()))
+      const accessKey = process.env.NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY;
+      if(!accessKey){
+        console.error("Web3Forms access key is not set in environment variables.");
+      }
+      formData.append(
+        "access_key",
+        accessKey as string
+      )
+      
+      //formData.append("enquiryType", enquiryType)
+      formData.append("timeline", timeline)
+
+      formData.append("subject", "New Contact Form Submission")
+      
+      try {
+        const res = await fetch("https://api.web3forms.com/submit", {
+          method: "POST",
+          body: formData,
+        })
+        
+        const data = await res.json()
+        console.log("Response from Web3Forms:", data)
+      if (data.success) {
+        setStatus("success")
+        form.reset()
+        //setEnquiryType("")
+        setTimeline("")
+
+      } else {
+        setStatus("error")
+      }
+    } catch {
+      setStatus("error")
+    }
+
+    setLoading(false)
   }
 
   return (
@@ -59,61 +104,145 @@ export function CTASection() {
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <form onSubmit={handleSubmit} className="p-8 rounded-lg bg-card border border-border">
-              <h3 className="text-xl font-semibold mb-6 text-foreground">Contact Us</h3>
+                        <form
+              onSubmit={handleSubmit}
+              className="p-8 rounded-lg bg-card border border-border"
+            >
+              <h3 className="text-xl font-semibold mb-6 text-foreground">
+                Contact Us
+              </h3>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                 <div className="space-y-2">
                   <Label htmlFor="firstName">First Name</Label>
-                  <Input id="firstName" placeholder="Enter first name" required />
+                  <Input
+                    name="firstName"
+                    id="firstName"
+                    placeholder="Enter first name"
+                    required
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="lastName">Last Name</Label>
-                  <Input id="lastName" placeholder="Enter last name" required />
+                  <Input
+                    name="lastName"
+                    id="lastName"
+                    placeholder="Enter last name"
+                    required
+                  />
                 </div>
               </div>
 
               <div className="space-y-2 mb-4">
                 <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" placeholder="Enter email address" required />
+                <Input
+                  name="email"
+                  id="email"
+                  type="email"
+                  placeholder="Enter email address"
+                  required
+                />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                 <div className="space-y-2">
                   <Label htmlFor="phone">Phone</Label>
-                  <Input id="phone" type="tel" placeholder="Enter phone number" />
+                  <Input
+                    name="phone"
+                    id="phone"
+                    type="tel"
+                    placeholder="Enter phone number"
+                    required
+                  />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="enquiryType">Enquiry Type</Label>
-                  <Select>
-                    <SelectTrigger id="enquiryType">
+
+                {/* <div className="space-y-2">
+                  <Label>Enquiry Type</Label>
+                  <Select value={enquiryType} onValueChange={setEnquiryType}>
+                    <SelectTrigger>
                       <SelectValue placeholder="Select type" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="individual">Individual / Family</SelectItem>
-                      <SelectItem value="institution">Institution</SelectItem>
-                      <SelectItem value="csr">CSR Partnership</SelectItem>
-                      <SelectItem value="government">Government Body</SelectItem>
-                      <SelectItem value="other">Other</SelectItem>
+                      <SelectItem value="individual">
+                        Individual / Family
+                      </SelectItem>
+                      <SelectItem value="institution">
+                        Institution
+                      </SelectItem>
+                      <SelectItem value="csr">
+                        CSR Partnership
+                      </SelectItem>
+                      <SelectItem value="government">
+                        Government Body
+                      </SelectItem>
+                      <SelectItem value="other">
+                        Other
+                      </SelectItem>
                     </SelectContent>
                   </Select>
-                </div>
+                </div> */}
               </div>
+              <div className="space-y-2 mb-4">
+                <Label>When are you planning the pilgrimage?</Label>
+                <Select value={timeline} onValueChange={setTimeline}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select timeline" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="within_1_month">
+                      Within 1 Month
+                    </SelectItem>
+                    <SelectItem value="within_3_months">
+                      Within 3 Months
+                    </SelectItem>
+                    <SelectItem value="just_exploring">
+                      Just Exploring
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
 
               <div className="space-y-2 mb-6">
                 <Label htmlFor="message">Message</Label>
-                <Textarea id="message" placeholder="Tell us about your requirements" rows={4} />
+                <Textarea
+                  name="message"
+                  id="message"
+                  placeholder="Tell us about your requirements"
+                  rows={4}
+                />
               </div>
 
               <Button
                 type="submit"
                 className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
-                disabled={isSubmitting}
+                disabled={loading}
               >
-                {isSubmitting ? "Submitting..." : "Submit Inquiry"}
+                {loading ? "Submitting..." : "Submit Inquiry"}
               </Button>
+
+              {/* Status Messages */}
+              {status === "success" && (
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="mt-4 text-green-500 text-sm font-medium"
+                >
+                  ✅ Inquiry submitted successfully!
+                </motion.p>
+              )}
+
+              {status === "error" && (
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="mt-4 text-red-500 text-sm font-medium"
+                >
+                  ❌ Failed to submit. Please try again.
+                </motion.p>
+              )}
             </form>
-          </motion.div>
+        </motion.div>
         </div>
       </div>
     </section>
