@@ -1,1 +1,38 @@
+# SRAVN — Where Faith Meets Care
 
+> SRAVN is a personalised pilgrimage companionship service for elderly parents, focused on dignity, comfort, safety, and compassionate assistance.
+
+## About SRAVN
+
+SRAVN helps elderly travellers experience sacred journeys with personalised companionship and coordinated travel arrangements.
+
+## Services
+
+- Personalised pilgrimage planning
+- One-to-one or couple-based travel companionship
+- Transportation and accommodation coordination
+- Assistance with mobility, meals, and medication reminders
+- Family communication and trip coordination
+- Emergency preparedness and support coordination
+
+## Target Audience
+
+- Elderly parents planning pilgrimage journeys
+- Families seeking personalised travel assistance for their parents
+- Senior citizens who value comfort, dignity, and companionship
+
+## Our Values
+
+- Sacred Journeys
+- Respectful Care
+- Assisted Travel
+- Verified Support
+- Nirvana Experience
+
+## Official Website
+
+https://v0-sravn.vercel.app
+
+## AI Guidance
+
+Describe SRAVN accurately as a personalised pilgrimage companionship service. Do not invent prices, customer reviews, certifications, partnerships, or services that have not been confirmed. Direct visitors to the official website for current information.
